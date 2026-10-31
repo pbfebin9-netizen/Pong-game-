@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pong Game</title>
+<style>
+body {
+    background: #111;
+    color: white;
+    text-align: center;
+    font-family: Arial;
+}
+canvas {
+    background: black;
+    border: 3px solid white;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏓 Pong Game</h1>
+<p>Use W and S keys to move your paddle.</p>
+
+<canvas id="game" width="700" height="400"></canvas>
+
+<h2 id="score">0 : 0</h2>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let player = 160;
+let computer = 160;
+
+let ballX = 350;
+let ballY = 200;
+let speedX = 4;
+let speedY = 3;
+
+let playerScore = 0;
+let computerScore = 0;
+
+let up = false;
+let down = false;
+
+document.addEventListener("keydown", e => {
+    if (e.key.toLowerCase() === "w") up = true;
+    if (e.key.toLowerCase() === "s") down = true;
+});
+
+document.addEventListener("keyup", e => {
+    if (e.key.toLowerCase() === "w") up = false;
+    if (e.key.toLowerCase() === "s") down = false;
+});
+
+function draw() {
+    ctx.clearRect(0, 0, 700, 400);
+
+    // Paddles
+    ctx.fillStyle = "white";
+    ctx.fillRect(20, player, 12, 80);
+    ctx.fillRect(668, computer, 12, 80);
+
+    // Ball
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Player movement
+    if (up && player > 0) player -= 5;
+    if (down && player < 320) player += 5;
+
+    // Computer movement
+    computer += (ballY - (computer + 40)) * 0.06;
+
+    // Ball movement
+    ballX += speedX;
+    ballY += speedY;
+
+    // Top and bottom collision
+    if (ballY < 8 || ballY > 392) speedY *= -1;
+
+    // Paddle collision
+    if (ballX < 32 && ballY > player && ballY < player + 80)
+        speedX = Math.abs(speedX);
+
+    if (ballX > 660 && ballY > computer && ballY < computer + 80)
+        speedX = -Math.abs(speedX);
+
+    // Scoring
+    if (ballX < 0) {
+        computerScore++;
+        resetBall();
+    }
+
+    if (ballX > 700) {
+        playerScore++;
+        resetBall();
+    }
+
+    document.getElementById("score").innerText =
+        playerScore + " : " + computerScore;
+
+    requestAnimationFrame(draw);
+}
+
+function resetBall() {
+    ballX = 350;
+    ballY = 200;
+    speedX *= -1;
+    speedY = 3;
+}
+
+draw();
+</script>
+
+</body>
+</html>
